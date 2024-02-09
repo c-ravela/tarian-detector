@@ -10,10 +10,11 @@ stain int read_node_info_into(node_info_t *, struct task_struct *);
 stain int init_task_context(task_context_t *, struct task_struct *, int);
 stain int init_event_context(event_context_t *, struct task_struct *, int, int);
 
-stain int new_program(program_data_t *pd, void *ctx, int event_id) {  
+stain int new_program(program_data_t *pd, void *ctx, int event_id) {
   // char test[16];
-  // bpf_probe_read_str(&test, TASK_COMM_LEN, get_task_comm_into((struct task_struct *)bpf_get_current_task()));
-  
+  // bpf_probe_read_str(&test, TASK_COMM_LEN, get_task_comm_into((struct
+  // task_struct *)bpf_get_current_task()));
+
   // char targetComm[] = "ls";
   // int i = 0;
   // bool commbool = true;
@@ -31,7 +32,8 @@ stain int new_program(program_data_t *pd, void *ctx, int event_id) {
 
   total++;
   pd->ctx = ctx; /* pt regs ctx*/
-  pd->task = (struct task_struct *)bpf_get_current_task(); /* task struct pointer*/
+  pd->task =
+      (struct task_struct *)bpf_get_current_task(); /* task struct pointer*/
   pd->cursor = 0;
 
   // reads syscall arguments
@@ -40,7 +42,7 @@ stain int new_program(program_data_t *pd, void *ctx, int event_id) {
     return err;
 
   pd->event = events_reserve_space((int)sizeof(*pd->event));
-  if (!pd->event){
+  if (!pd->event) {
     return RINGBUF_CAPACITY_REACHED_ERR;
   }
 
@@ -48,7 +50,9 @@ stain int new_program(program_data_t *pd, void *ctx, int event_id) {
   pd->event->buf.field_types = 0;
   flush(pd->event->buf.data, sizeof(pd->event->buf.data));
 
-  err = init_event_context(&pd->event->context, pd->task, event_id /* event id */, (int)(pd->sys_ctx[6]) /* syscall id */);
+  err =
+      init_event_context(&pd->event->context, pd->task, event_id /* event id */,
+                         (int)(pd->sys_ctx[6]) /* syscall id */);
   if (err != OK) {
     events_ringbuf_discard(pd);
     return err;
@@ -61,7 +65,8 @@ stain int new_program(program_data_t *pd, void *ctx, int event_id) {
   return OK;
 };
 
-stain int init_event_context(event_context_t *e, struct task_struct *t, int event_id, int syscall_id) {
+stain int init_event_context(event_context_t *e, struct task_struct *t,
+                             int event_id, int syscall_id) {
   int err = init_task_context(&e->task, t, event_id);
   if (err != OK)
     return err;
@@ -74,7 +79,8 @@ stain int init_event_context(event_context_t *e, struct task_struct *t, int even
   return OK;
 }
 
-stain int init_task_context(task_context_t *tc, struct task_struct *t, int event_id) {
+stain int init_task_context(task_context_t *tc, struct task_struct *t,
+                            int event_id) {
   tc->start_time = get_task_start_time(t);
 
   u64 tpid = bpf_get_current_pid_tgid();
@@ -105,7 +111,7 @@ stain int init_task_context(task_context_t *tc, struct task_struct *t, int event
   if (csz < 0)
     return NOT_OK;
 
-  // !(tc->host_pid == 171055 || tc->host_ppid == 171055) || 
+  // !(tc->host_pid == 171055 || tc->host_ppid == 171055) ||
   // if (!(tc->host_pid == 729918 || tc->host_ppid == 729918)) {
   //   return 500;
   // }
@@ -122,8 +128,9 @@ stain int init_task_context(task_context_t *tc, struct task_struct *t, int event
   // bpf_probe_read_str(&test, 256, &tc->cwd[cur & (MAX_STRING_SIZE - 1)]);
   // bpf_printk("string: %d, %d == %s", cur, sz, test);
 
-  // bpf_printk("string: %ld %ld", get_task_self_exec_id(t), get_task_parent_exec_id(t));
-  
+  // bpf_printk("string: %ld %ld", get_task_self_exec_id(t),
+  // get_task_parent_exec_id(t));
+
   tc->eexec_id = getExecId(tc->host_pid, t);
   tc->eparent_exec_id = getParentExecId(tc->host_ppid, t);
 
@@ -132,7 +139,8 @@ stain int init_task_context(task_context_t *tc, struct task_struct *t, int event
 
 stain int read_cwd_into(struct path *path, u8 *buf) {
   /*
-    Data saved to buf: [start index of string 2byte][size of the string 2byte]....[...string....]
+    Data saved to buf: [start index of string 2byte][size of the string
+    2byte]....[...string....]
   */
   char slash = '/';
   int zero = 0;
@@ -154,8 +162,9 @@ stain int read_cwd_into(struct path *path, u8 *buf) {
   struct qstr d_name;
 
   unsigned int len = 0;
-  short cursor = MAX_STRING_SIZE - 1; // current index in buffer. starts with 4095
-  short str_len = 0; // total size of string written to buffer
+  short cursor =
+      MAX_STRING_SIZE - 1; // current index in buffer. starts with 4095
+  short str_len = 0;       // total size of string written to buffer
 
 #pragma unroll
   for (int i = 0; i < MAX_PATH_LOOP /* 20 */; i++) {
@@ -167,9 +176,11 @@ stain int read_cwd_into(struct path *path, u8 *buf) {
         break;
       }
       if (mnt_p != mnt_parent_p) {
-        bpf_probe_read(&dentry, sizeof(struct dentry *), &mnt_p->mnt_mountpoint);
+        bpf_probe_read(&dentry, sizeof(struct dentry *),
+                       &mnt_p->mnt_mountpoint);
         bpf_probe_read(&mnt_p, sizeof(struct mount *), &mnt_p->mnt_parent);
-        bpf_probe_read(&mnt_parent_p, sizeof(struct mount *), &mnt_p->mnt_parent);
+        bpf_probe_read(&mnt_parent_p, sizeof(struct mount *),
+                       &mnt_p->mnt_parent);
         vfsmnt = &mnt_p->mnt;
 
         continue;
@@ -182,15 +193,19 @@ stain int read_cwd_into(struct path *path, u8 *buf) {
     len = (d_name.len + 1) & (MAX_STRING_SIZE - 1);
 
     // Check buffer capacity
-    if ((MAX_STRING_SIZE - str_len - sizeof(int) /* for string index and len */ - 1 /* for null byte at the end*/) < MAX_STRING_SIZE) {
+    if ((MAX_STRING_SIZE - str_len -
+         sizeof(int) /* for string index and len */ -
+         1 /* for null byte at the end*/) < MAX_STRING_SIZE) {
       cursor -= len;
-      sz = bpf_probe_read_str(&(buf[cursor & (MAX_STRING_SIZE - 1)]), len, (void *)d_name.name);
+      sz = bpf_probe_read_str(&(buf[cursor & (MAX_STRING_SIZE - 1)]), len,
+                              (void *)d_name.name);
     } else
       break;
 
     if (sz > 1) {
       str_len += sz;
-      bpf_probe_read(&(buf[(cursor + len - 1) & (MAX_STRING_SIZE - 1)]), 1, &slash);
+      bpf_probe_read(&(buf[(cursor + len - 1) & (MAX_STRING_SIZE - 1)]), 1,
+                     &slash);
     } else
       break;
 
@@ -201,13 +216,15 @@ stain int read_cwd_into(struct path *path, u8 *buf) {
     d_name = get_d_name_from_dentry(dentry);
     len = (d_name.len) & (MAX_STRING_SIZE - 1);
     cursor -= len;
-    sz = bpf_probe_read_str(&(buf[cursor & (MAX_STRING_SIZE - 1)]), MAX_STRING_SIZE, (void *)d_name.name);
+    sz = bpf_probe_read_str(&(buf[cursor & (MAX_STRING_SIZE - 1)]),
+                            MAX_STRING_SIZE, (void *)d_name.name);
     str_len += sz;
   } else {
     cursor -= 1;
     bpf_probe_read(&(buf[cursor & (MAX_STRING_SIZE - 1)]), 1, &slash);
     bpf_probe_read(&(buf[MAX_STRING_SIZE - 1]), 1, &zero);
-    str_len += 2; /* 1 for null termination + 1 for adding slash in the begning of the string */
+    str_len += 2; /* 1 for null termination + 1 for adding slash in the begning
+                     of the string */
   }
 
   // write start index of string to buffer

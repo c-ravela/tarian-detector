@@ -26,7 +26,6 @@ const (
 func ProcsContainerID(pid uint32) (string, error) {
 	pidstr := fmt.Sprint(pid)
 	cgroups, err := os.ReadFile(filepath.Join(HostProcDir, pidstr, "cgroup"))
-
 	if err != nil {
 		return "", err
 	}
