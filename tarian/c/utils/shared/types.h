@@ -21,7 +21,7 @@ typedef struct {
 typedef struct __attribute__((__packed__)) task_context {
   u64 start_time; /* task's start time */
 
-  u32 host_pid; /* task's process id */
+  u32 host_pid;  /* task's process id */
   u32 host_tgid; /* task's thread group id */
 
   u32 host_ppid; /* task's parent process id */
@@ -29,7 +29,7 @@ typedef struct __attribute__((__packed__)) task_context {
   u32 pid;  /* task's namespace process id */
   u32 tgid; /* task's namespace thread group id */
 
-  u32 ppid;  /* task's parent process id */
+  u32 ppid; /* task's parent process id */
 
   u32 uid; /* task's effective user id */
   u32 gid; /* task's effective group id */
@@ -41,30 +41,31 @@ typedef struct __attribute__((__packed__)) task_context {
 
   u64 exec_id;
   u64 parent_exec_id;
-  
+
   u64 eexec_id;
   u64 eparent_exec_id;
 
-  u8 comm[TASK_COMM_LEN]; /* task's process name*/
+  u8 comm[TASK_COMM_LEN];  /* task's process name*/
   u8 cwd[MAX_STRING_SIZE]; /* current working directory of task */
-} task_context_t;           /* 4176B */
+} task_context_t;          /* 4176B */
 
 typedef struct __attribute__((__packed__)) event_context {
   u64 ts; /* event timestamp */
 
   task_context_t task;
 
-  u32 event_id;   /* event id associated with the event */
-  s32 syscall; /* syscall id (system call) associated with the event */
+  u32 event_id; /* event id associated with the event */
+  s32 syscall;  /* syscall id (system call) associated with the event */
 
   u16 processor_id; /* processor id where the event was processed */
-} event_context_t; /* 4194B */
+} event_context_t;  /* 4194B */
 
 typedef struct __attribute__((__packed__)) syscall_buffer {
   u8 num_fields;         /* no of fields; */
-  u64 field_types;      /* bitmask representing the XOR of field types */
-  u8 data[SYS_BUF_SIZE]; /* buffer for storing  syscall information(arguments, return value)*/
-} syscall_buffer_t;     /* 10249B */
+  u64 field_types;       /* bitmask representing the XOR of field types */
+  u8 data[SYS_BUF_SIZE]; /* buffer for storing  syscall information(arguments,
+                            return value)*/
+} syscall_buffer_t;      /* 10249B */
 
 typedef struct __attribute__((__packed__)) event_data {
   event_context_t context;
@@ -75,8 +76,10 @@ typedef struct __attribute__((__packed__)) event_data {
 typedef struct program_data {
   event_data_t *event;
   sys_ctx_t sys_ctx; /* context of the syscall */
-  u32 cursor;       /* cursor indicating the current position of data in syscall_buffer*/
-  struct task_struct *task /* pointer to the task_struct representing the task */;
+  u32 cursor;        /* cursor indicating the current position of data in
+                        syscall_buffer*/
+  struct task_struct
+      *task /* pointer to the task_struct representing the task */;
   void *ctx;      /* pointer to register context */
 } program_data_t; /* 88B */
 

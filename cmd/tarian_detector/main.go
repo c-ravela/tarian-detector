@@ -60,7 +60,6 @@ func main() {
 	count := 0
 	// var mutex sync.Mutex
 	go func() {
-
 		select {
 		case <-stopper:
 			// case <-time.After(10 * time.Second):

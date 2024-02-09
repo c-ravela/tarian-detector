@@ -10,10 +10,10 @@ stain int init_sys_ctx(sys_ctx_t *dst) {
   if (dst == NULL)
     return NULL_POINTER_ERROR;
 
-  for (int i = 0; i < MAX_ARGS; i++){
+  for (int i = 0; i < MAX_ARGS; i++) {
     (*dst)[i] = 0;
   }
-  
+
   return OK;
 };
 

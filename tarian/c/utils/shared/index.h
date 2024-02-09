@@ -4,8 +4,8 @@
 #include "constants.h"
 #include "types.h"
 
-#include "maps.h"
 #include "error_codes.h"
+#include "maps.h"
 
 // kernel data structure specific headers
 #include "nsproxy.h"

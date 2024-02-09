@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Authors of Tarian & the Organization created Tarian
 
-//go:build ignore
+// go:build ignore
 
 #include "common.h"
 
@@ -16,11 +16,16 @@ int kprobe_clone(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* binary file path */, ULONG_T, 0);
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM2] /* binary file path */, ULONG_T, 1);
-  save_to_buffer(&p, (void *)p.sys_ctx[PARAM3] /* binary file path */, INT_T, 2);
-  save_to_buffer(&p, (void *)p.sys_ctx[PARAM4] /* binary file path */, INT_T, 3);
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM5] /* binary file path */, ULONG_T, 4);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* binary file path */, ULONG_T,
+                 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM2] /* binary file path */, ULONG_T,
+                 1);
+  save_to_buffer(&p, (void *)p.sys_ctx[PARAM3] /* binary file path */, INT_T,
+                 2);
+  save_to_buffer(&p, (void *)p.sys_ctx[PARAM4] /* binary file path */, INT_T,
+                 3);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM5] /* binary file path */, ULONG_T,
+                 4);
 
   events_ringbuf_submit(&p);
   return OK;
@@ -50,7 +55,8 @@ int kprobe_execve(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (char *)p.sys_ctx[PARAM1] /* binary file path */, STR_T, 0);
+  save_to_buffer(&p, (char *)p.sys_ctx[PARAM1] /* binary file path */, STR_T,
+                 0);
   // save_to_buffer(&p, (void *)p.sys_ctx[1] /* user command */, STR_ARR_T, 1);
   // save_to_buffer(&p, (void *)p.sys_ctx[1] /* user command */, STR_ARR_T, 2);
   // bpf_printk("test execve indx str %d", (int)p.cursor);
@@ -87,8 +93,10 @@ int kprobe_execveat(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file_descriptor */, INT_T, 0);
-  save_to_buffer(&p, (char *)p.sys_ctx[PARAM2] /* binary file path */, STR_T, 1);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file_descriptor */, INT_T,
+                 0);
+  save_to_buffer(&p, (char *)p.sys_ctx[PARAM2] /* binary file path */, STR_T,
+                 1);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM5] /* flags */, INT_T, 4);
 
   events_ringbuf_submit(&p);
@@ -103,7 +111,7 @@ int kretprobe_execveat(struct pt_regs *ctx) {
     dropped++;
     return err;
   }
- 
+
   save_to_buffer(&p, (void *)&p.sys_ctx[RETURN], INT_T, 0);
 
   events_ringbuf_submit(&p);
@@ -151,7 +159,8 @@ int kprobe_openat(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* directory file descriptor */, INT_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* directory file descriptor */,
+                 INT_T, 0);
   save_to_buffer(&p, (void *)p.sys_ctx[PARAM2] /* filename */, STR_T, 1);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM3] /* flags */, INT_T, 2);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM4] /* mode */, UINT_T, 3);
@@ -184,9 +193,11 @@ int kprobe_openat2(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* directory file descriptor */, INT_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* directory file descriptor */,
+                 INT_T, 0);
   save_to_buffer(&p, (void *)p.sys_ctx[PARAM2] /* filename */, STR_T, 1);
-  // save_to_buffer(&p, (void *)&p.sys_ctx[PARAM3] /* how */, INT, 2); //Need to handle user defined types
+  // save_to_buffer(&p, (void *)&p.sys_ctx[PARAM3] /* how */, INT, 2); //Need to
+  // handle user defined types
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM4] /* usize */, LONG_T, 3);
 
   events_ringbuf_submit(&p);
@@ -217,7 +228,8 @@ int kprobe_close(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T,
+                 0);
 
   events_ringbuf_submit(&p);
   return OK;
@@ -247,7 +259,8 @@ int kprobe_read(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, UINT_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, UINT_T,
+                 0);
   // save_to_buffer(&p, (void *)p.sys_ctx[PARAM2]  /* buffer */, STR_T, 1);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM3] /* flags */, ULONG_T, 2);
 
@@ -264,7 +277,8 @@ int kretprobe_read(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[RETURN] /* number of bytes read */, LONG_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[RETURN] /* number of bytes read */,
+                 LONG_T, 0);
 
   events_ringbuf_submit(&p);
   return OK;
@@ -279,7 +293,8 @@ int kprobe_readv(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, ULONG_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, ULONG_T,
+                 0);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM3] /* vlen */, ULONG_T, 2);
 
   events_ringbuf_submit(&p);
@@ -295,7 +310,8 @@ int kretprobe_readv(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[RETURN] /* number of bytes read */, LONG_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[RETURN] /* number of bytes read */,
+                 LONG_T, 0);
 
   events_ringbuf_submit(&p);
   return OK;
@@ -310,7 +326,8 @@ int kprobe_write(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, UINT_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, UINT_T,
+                 0);
   // save_to_buffer(&p, (void *)p.sys_ctx[PARAM2]  /* buffer */, STR_T, 1);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM3] /* flags */, ULONG_T, 2);
 
@@ -327,7 +344,8 @@ int kretprobe_write(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[RETURN] /* number of bytes wrote */, LONG_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[RETURN] /* number of bytes wrote */,
+                 LONG_T, 0);
 
   events_ringbuf_submit(&p);
   return OK;
@@ -341,7 +359,8 @@ int kprobe_writev(struct pt_regs *ctx) {
     dropped++;
     return err;
   }
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, ULONG_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, ULONG_T,
+                 0);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM3] /* vlen */, ULONG_T, 2);
 
   events_ringbuf_submit(&p);
@@ -356,7 +375,8 @@ int kretprobe_writev(struct pt_regs *ctx) {
     dropped++;
     return err;
   }
-  save_to_buffer(&p, (void *)&p.sys_ctx[RETURN] /* number of bytes wrote */, LONG_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[RETURN] /* number of bytes wrote */,
+                 LONG_T, 0);
 
   events_ringbuf_submit(&p);
   return OK;
@@ -371,7 +391,8 @@ int kprobe_listen(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T,
+                 0);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM2] /* backlog */, INT_T, 1);
 
   events_ringbuf_submit(&p);
@@ -434,7 +455,8 @@ int kprobe_accept(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T,
+                 0);
   // save_to_buffer(&p, (void *)&p.sys_ctx[PARAM2] /* type */, INT_T, 1);
   save_to_buffer(&p, (void *)p.sys_ctx[PARAM3] /* upeer_addrlen */, INT_T, 2);
 
@@ -466,7 +488,8 @@ int kprobe_bind(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T,
+                 0);
   // save_to_buffer(&p, (void *)&p.sys_ctx[PARAM2] /* type */, INT_T, 1);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM3] /* upeer_addrlen */, INT_T, 2);
 
@@ -498,7 +521,8 @@ int kprobe_connect(struct pt_regs *ctx) {
     return err;
   }
 
-  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T, 0);
+  save_to_buffer(&p, (void *)&p.sys_ctx[PARAM1] /* file descriptor */, INT_T,
+                 0);
   // save_to_buffer(&p, (void *)&p.sys_ctx[PARAM2] /* type */, INT_T, 1);
   save_to_buffer(&p, (void *)&p.sys_ctx[PARAM3] /* upeer_addrlen */, INT_T, 2);
 
