@@ -1,0 +1,19 @@
+version = 1
+
+[[analyzers]]
+name = "cxx"
+
+[[analyzers]]
+name = "go"
+
+  [analyzers.meta]
+  import_root = "github.com/c-ravela/tarian-detector"
+
+[[transformers]]
+name = "gofmt"
+
+[[transformers]]
+name = "gofumpt"
+
+[[transformers]]
+name = "clang-format"
