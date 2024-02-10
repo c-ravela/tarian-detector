@@ -106,6 +106,6 @@ typedef struct tarian_stats {
 
   /* count of events with bpf_probe_read_* failures */
   u64 n_trgs_read_error;
-} tarian_stats_t;  /* 48B */
+} tarian_stats_t; /* 48B */
 
 #endif
