@@ -23,9 +23,7 @@ const (
 	containerIDLen = 15
 )
 
-var (
-	errNotPod = errors.New("object is not a *corev1.Pod")
-)
+var errNotPod = errors.New("object is not a *corev1.Pod")
 
 // ContainerIndexFunc index pod by container IDs.
 func ContainerIndexFunc(obj interface{}) ([]string, error) {
