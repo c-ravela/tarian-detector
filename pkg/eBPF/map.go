@@ -37,9 +37,7 @@ const (
 	ErrUnsupportedInnerBpfMapType string = "unsupported BPF map type found within the array of maps: %v"
 )
 
-var (
-	mapErr = err.New("ebpf.map")
-)
+var mapErr = err.New("ebpf.map")
 
 func NewRingBuf(m *ebpf.Map) *MapInfo {
 	return &MapInfo{
