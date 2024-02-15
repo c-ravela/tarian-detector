@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2023 Authors of Tarian & the Organization created Tarian
+// Copyright 2024 Authors of Tarian & the Organization created Tarian
 
 package ebpf
 
@@ -31,14 +31,14 @@ const (
 
 const (
 	ErrNilMapPointer              string = "nil pointer received, expected cilium/ebpf.Map pointer"
-	ErrNilMapReader                      = "nil pointer received, expected pointer to cilium/ebpf map reader"
-	ErrUnsupportedBpfMapType             = "unsupported BPF map type: %v"
-	ErrUnsupportedMapReader              = "unsupported cilium/ebpf map reader: %T"
-	ErrUnsupportedInnerBpfMapType        = "unsupported BPF map type found within the array of maps: %v"
+	ErrNilMapReader               string = "nil pointer received, expected pointer to cilium/ebpf map reader"
+	ErrUnsupportedBpfMapType      string = "unsupported BPF map type: %v"
+	ErrUnsupportedMapReader       string = "unsupported cilium/ebpf map reader: %T"
+	ErrUnsupportedInnerBpfMapType string = "unsupported BPF map type found within the array of maps: %v"
 )
 
 var (
-	mapErr = err.New("ebpf.Map")
+	mapErr = err.New("ebpf.map")
 )
 
 func NewRingBuf(m *ebpf.Map) *MapInfo {
@@ -180,14 +180,14 @@ func read(readers []any) ([]func() ([]byte, error), error) {
 	for _, reader := range readers {
 		switch r := reader.(type) {
 		case *ringbuf.Reader:
-			f, err := read_ringbuf(r)
+			f, err := readRingbuf(r)
 			if err != nil {
 				return nil, err
 			}
 
 			funcs = append(funcs, f)
 		case *perf.Reader:
-			f, err := read_perf(r)
+			f, err := readPerf(r)
 			if err != nil {
 				return nil, err
 			}
@@ -201,7 +201,7 @@ func read(readers []any) ([]func() ([]byte, error), error) {
 	return funcs, nil
 }
 
-func read_ringbuf(r *ringbuf.Reader) (func() ([]byte, error), error) {
+func readRingbuf(r *ringbuf.Reader) (func() ([]byte, error), error) {
 	if r == nil {
 		return nil, mapErr.Throw(ErrNilMapReader)
 	}
@@ -216,7 +216,7 @@ func read_ringbuf(r *ringbuf.Reader) (func() ([]byte, error), error) {
 	}, nil
 }
 
-func read_perf(pr *perf.Reader) (func() ([]byte, error), error) {
+func readPerf(pr *perf.Reader) (func() ([]byte, error), error) {
 	if pr == nil {
 		return nil, mapErr.Throw(ErrNilMapReader)
 	}
@@ -250,4 +250,17 @@ func closeMapReaders(readers []any) error {
 	}
 
 	return nil
+}
+
+func (mit MapInfoType) String() string {
+	switch mit {
+	case RingBuffer:
+		return "RingBuffer"
+	case PerfEventArray:
+		return "PerfEventArray"
+	case ArrayOfMaps:
+		return "ArrayOfMaps"
+	default:
+		return fmt.Sprintf("unknown MapInfoType(%d)", int(mit))
+	}
 }

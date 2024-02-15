@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2023 Authors of Tarian & the Organization created Tarian
+// Copyright 2024 Authors of Tarian & the Organization created Tarian
 
 package ebpf
 
@@ -14,7 +14,7 @@ type Handler struct {
 	probeLinks []link.Link
 }
 
-var handlerErr = err.New("ebpf.Handler")
+var handlerErr = err.New("ebpf.handler")
 
 func NewHandler(n string) *Handler {
 	return &Handler{
@@ -34,6 +34,10 @@ func (h *Handler) AddMapReaders(mrs []any) {
 
 func (h *Handler) ReadAsInterface() ([]func() ([]byte, error), error) {
 	return read(h.mapReaders)
+}
+
+func (h *Handler) Count() int {
+	return len(h.probeLinks)
 }
 
 func (h *Handler) Close() error {

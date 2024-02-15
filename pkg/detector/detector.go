@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2023 Authors of Tarian & the Organization created Tarian
+// Copyright 2024 Authors of Tarian & the Organization created Tarian
 
 package detector
 
 import (
-	"github.com/cilium/ebpf/ringbuf"
+	"github.com/intelops/tarian-detector/pkg/err"
 	"github.com/intelops/tarian-detector/pkg/eventparser"
 )
 
+var detectorErr = err.New("detector.detector")
+
 type EventDetector interface {
+	Count() int
 	Close() error
 	ReadAsInterface() ([]func() ([]byte, error), error)
 }
@@ -19,13 +22,13 @@ type detectorReadReturn struct {
 }
 
 type EventsDetector struct {
-	detectors  []EventDetector
-	eventQueue chan detectorReadReturn
-	started    bool
-	closed     bool
-
-	ProbeRecordsCount map[string]int
-	TotalRecordsCount int
+	detectors         []EventDetector
+	eventQueue        chan detectorReadReturn
+	started           bool
+	closed            bool
+	totalRecordsCount int
+	totalDetectors    int
+	probeRecordsCount map[string]int
 }
 
 func NewEventsDetector() *EventsDetector {
@@ -35,13 +38,35 @@ func NewEventsDetector() *EventsDetector {
 		started:    false,
 		closed:     false,
 
-		ProbeRecordsCount: make(map[string]int),
-		TotalRecordsCount: 0,
+		probeRecordsCount: make(map[string]int),
+		totalRecordsCount: 0,
+		totalDetectors:    0,
 	}
 }
 
-func (t *EventsDetector) Add(detectors EventDetector) {
-	t.detectors = append(t.detectors, detectors)
+func (t *EventsDetector) Add(detector EventDetector) {
+	t.detectors = append(t.detectors, detector)
+	t.incrementDetectorCountBy(detector.Count())
+}
+
+func (t *EventsDetector) incrementDetectorCountBy(n int) {
+	t.totalDetectors += n
+}
+
+func (t *EventsDetector) incrementTotalCount() {
+	t.totalRecordsCount++
+}
+
+func (t *EventsDetector) GetTotalCount() int {
+	return t.totalRecordsCount
+}
+
+func (t *EventsDetector) probeCount(probe string) {
+	t.probeRecordsCount[probe]++
+}
+
+func (t *EventsDetector) GetProbeCount() map[string]int {
+	return t.probeRecordsCount
 }
 
 func (t *EventsDetector) Start() error {
@@ -49,7 +74,7 @@ func (t *EventsDetector) Start() error {
 		d := detector
 		mapReaders, err := d.ReadAsInterface()
 		if err != nil {
-			return err
+			return detectorErr.Throwf("%v", err)
 		}
 
 		for _, reader := range mapReaders {
@@ -83,7 +108,7 @@ func (t *EventsDetector) Close() error {
 	for _, detector := range t.detectors {
 		err := detector.Close()
 		if err != nil {
-			return err
+			return detectorErr.Throwf("%v", err)
 		}
 	}
 
@@ -91,19 +116,26 @@ func (t *EventsDetector) Close() error {
 }
 
 func (t *EventsDetector) ReadAsInterface() (map[string]any, error) {
+	eventparser.LoadTarianEvents()
 	r := <-t.eventQueue
 	if r.err != nil {
-		return map[string]any{}, r.err
+		return map[string]any{}, detectorErr.Throwf("%v", r.err)
 	}
 
-	data, err := eventparser.DecodeByte(r.eventData)
-	return data, err
+	t.incrementTotalCount()
+	data, err := eventparser.ParseByteArray(r.eventData)
+	if err != nil {
+		return data, detectorErr.Throwf("%v", err)
+	}
+
+	probe, ok := data["eventId"]
+	if ok {
+		t.probeCount(probe.(string))
+	}
+
+	return data, nil
 }
 
 func (t *EventsDetector) Count() int {
-	return len(t.detectors)
-}
-
-func mapReader(r *ringbuf.Reader) (ringbuf.Record, error) {
-	return r.Read()
+	return t.totalDetectors
 }
