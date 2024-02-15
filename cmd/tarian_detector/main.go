@@ -4,7 +4,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -56,6 +55,7 @@ func main() {
 		<-stopper
 
 		eventsDetector.Close()
+		log.Printf("Total records captured : %d\n", eventsDetector.GetTotalCount())
 		os.Exit(0)
 	}()
 
@@ -67,6 +67,10 @@ func main() {
 				log.Print(err)
 			}
 
+			if len(e) == 0 {
+				continue
+			}
+
 			k8sCtx, err := GetK8sContext(watcher, e["hostProcessId"].(uint32))
 			if err != nil {
 				e["kubernetes"] = err.Error()
@@ -74,7 +78,7 @@ func main() {
 				e["kubernetes"] = k8sCtx
 			}
 
-			// printEvent(e, eventsDetector.GetTotalCount())
+			// utils.PrintEvent(e, eventsDetector.GetTotalCount())
 		}
 	}()
 
@@ -82,14 +86,4 @@ func main() {
 	for {
 		time.Sleep(1 * time.Minute)
 	}
-}
-
-func printEvent(data map[string]any, t int) {
-	div := "=================================="
-	msg := ""
-	for ky, val := range data {
-		msg += fmt.Sprintf("%s: %v\n", ky, val)
-	}
-
-	log.Printf("Total captured %d.\n%s\n%s%s\n", t, div, msg, div)
 }
