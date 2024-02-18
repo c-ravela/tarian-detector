@@ -108,6 +108,6 @@ typedef struct tarian_stats {
   u64 n_trgs_read_error;
 
   u64 n_trgs_unknown;
-} tarian_stats_t;  /* 48B */
+} tarian_stats_t; /* 48B */
 
 #endif
