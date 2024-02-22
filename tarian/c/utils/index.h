@@ -1,11 +1,11 @@
 #ifndef __UTLIS_INDEX_H__
 #define __UTLIS_INDEX_H__
 
-#include "shared/index.h"
+#include "filters.h"
 #include "shared.h"
+#include "shared/index.h"
 #include "stats.h"
 #include "tarian.h"
-#include "filters.h"
 
 #include "meta.h"
 
