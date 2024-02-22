@@ -178,7 +178,8 @@ func TestPrintEvent(t *testing.T) {
 				},
 				t: 0,
 			},
-		}}
+		},
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			PrintEvent(tt.args.data, tt.args.t)
