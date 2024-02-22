@@ -54,7 +54,8 @@ func TestInt8(t *testing.T) {
 			},
 			want:    0,
 			wantErr: true,
-		}, {
+		},
+		{
 			name: "empty byte slice",
 			args: args{
 				b:   []byte{},
@@ -116,7 +117,8 @@ func TestInt16(t *testing.T) {
 			},
 			want:    0,
 			wantErr: true,
-		}}
+		},
+	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -216,7 +218,8 @@ func TestInt64(t *testing.T) {
 			},
 			want:    0,
 			wantErr: true,
-		}, {
+		},
+		{
 			name: "invalid negative pos",
 			args: args{
 				b:   []byte{1, 2, 3, 4},
@@ -278,7 +281,8 @@ func TestUint8(t *testing.T) {
 			},
 			want:    0,
 			wantErr: true,
-		}, {
+		},
+		{
 			name: "invalid negative pos",
 			args: args{
 				b:   []byte{1, 2, 3},
@@ -286,7 +290,8 @@ func TestUint8(t *testing.T) {
 			},
 			want:    0,
 			wantErr: true,
-		}, {
+		},
+		{
 			name: "empty slice",
 			args: args{
 				b:   []byte{},
@@ -339,7 +344,8 @@ func TestUint16(t *testing.T) {
 			},
 			want:    0,
 			wantErr: true,
-		}, {
+		},
+		{
 			name: "invalid negative pos",
 			args: args{
 				b:   []byte{1, 2, 3},
@@ -392,7 +398,8 @@ func TestUint32(t *testing.T) {
 			},
 			want:    0,
 			wantErr: true,
-		}, {
+		},
+		{
 			name: "invalid negative pos",
 			args: args{
 				b:   []byte{1, 2, 3, 4},
@@ -446,7 +453,8 @@ func TestUint64(t *testing.T) {
 			},
 			want:    0,
 			wantErr: true,
-		}, {
+		},
+		{
 			name: "invalid negative pos",
 			args: args{
 				b:   []byte{1, 2, 3, 4},
